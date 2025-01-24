@@ -1,65 +1,15 @@
 from fractions import Fraction
+from polynomialSolver import PolynomialSolver
 
-class AdvancedPolynomialSolver:
+class AdvancedPolynomialSolver(PolynomialSolver):
     def __init__(self, equation):
         self.equation = equation.strip()
         self.stock = {}
         self.variable = self._parse_equation()
-        stock = self._get_reduced_form(self.equation.split("=")[0], 'left')
-        print(f"stock after change :\n{stock}")
-    
-    def get_stock(self):
-        return self.stock
-
-
-# if equation_list[i]  == '^' and (equation_list[i + 1] == '' or equation_list[i + 1].isdigit() == False):
-#                 raise SyntaxError("Error: Incorrect format")
-
-
-    def _get_reduced_form(self, equation, equation_parts, stoclk={}):
-        equation = "".join(equation.split(" "))
-        const_holder = []
         
-        print(equation)
-        for i in range(len(equation)):
-            print(f"************************ i: {i} | equation[i]: {equation[i]} *************************")
-            if equation[i].isdigit():
-                print(f"var is digit -->  {equation[i]}",end=" | ")
-                # if const_holder:
-                #         const_holder.append(str(-1 * float(equation[i])))
-                #     else:
-                #         const_holder.append(float(equation[i]))
-                # print(f"const_holder : {const_holder}")
-            
-            
-            elif equation[i] == '*':
-                if equation[i + 1].isdigit():
-                    print(f"the var is not * --> {equation[i]} | const_holder: {const_holder}")
-                    const_holder.append(float(const_holder.pop()) * float(equation[i + 1]))
-                    i += 1
-            
-            elif equation[i] == '/':
-                if equation[i] == '/' and equation[i + 1] and (equation[i + 1] == '0' \
-                    or equation[i + 1].isdigit() == False):
-                    raise SyntaxError("Error: Incorrect format")
-                const_holder.append(float(const_holder.pop()) / float(equation[i + 1]))
-                i += 1
-            
-            elif equation[i] == self.variable:
-                print(f"var is {equation[i]}, const_holder: {const_holder}")
-                if equation[i + 1] == '^':
-                    
-                    if equation[i + 2].isdigit():
-                        stock[int(equation[i + 2])] = equation[i + 2]
-                        i += 2
-                else:
-                    stock[1] = const_holder.pop()
-            
-            
-            elif len(const_holder) != 0 and  equation[i] in ('+', '-'):
-                stock[0] = const_holder.pop()
-                const_holder.append(equation[i])
-        return stock
+        stock = self._get_reduced_form(equation.split("=")[0], 'left')
+        self.parsed_equation = self._get_reduced_form(equation.split("=")[1], 'right', stock)
+        
 
 
     def _parse_equation(self):
@@ -70,11 +20,90 @@ class AdvancedPolynomialSolver:
         if len(variables) > 1:
             raise SyntaxError(("Error: Invalid equation, only one variable is allowed"))
         for var in self.equation:
-            if var not in ('*', '+', '-', '^', variables, ' ', '=') and not var.isdigit():
+            if var not in "*-+^ =." and var.isdigit() == False and var not in variables:
                 raise SyntaxError(("Error: Syntax error"))
         if self.equation.count('=') != 1:
             raise SyntaxError(("Error: Invalid equation, only one equal sign is allowed"))
         if (not self.equation[0].isalnum() or self.equation[0] not in '+-') \
                 and not self.equation[-1].isalnum():
             raise SyntaxError(("Error: Invalid equation"))
-        return variables
+        
+        equation_str = "".join(self.equation.split(" "))
+        for i in range(len(equation_str)):
+            if equation_str[i]  == '^' and(equation_str[i + 1] == '' or equation_str[i + 1].isdigit() == False):
+                raise SyntaxError("Error: Incorrect format")
+            if equation_str[i] == '/' and equation_str[i + 1] and (equation_str[i + 1] == '0' \
+                or equation_str[i + 1].isdigit() == False):
+                raise SyntaxError("Error: Incorrect format")
+            if equation_str[i] == '*' and equation_str[i + 1].isdigit() == False and equation_str[i + 1] != variables:
+                raise SyntaxError("Error: Incorrect format")
+            if equation_str[i] in '+-' and equation_str[i + 1].isdigit() == False:
+                raise SyntaxError("Error: Incorrect format")
+
+
+    @staticmethod
+    def solve_degree_2(parsed_equation):
+        a = float(parsed_equation[2])
+        b = float(parsed_equation[1])
+        c = float(parsed_equation[0])
+        delta = b ** 2 - 4 * a * c
+        print(f"""calculating discriminant:
+            delta = (b^2 + 4ac)
+            delta = {b}^2 - 4 * {a} * {c}
+            delta = {delta}""")
+        if delta > 0:
+            x1 = (-b - delta ** 0.5) / (2 * a)
+            x2 = (-b + delta ** 0.5) / (2 * a)
+            print(f"""
+            Discriminant is strictly positive, the two solutions are:
+                    x1 = (-b - delta ** 0.5) / (2 * a)
+                    x1 = ({-b} - {delta} ** 0.5) / (2 * {a})
+                    x1 = {x1}
+                    
+                    x2 = (-b + delta ** 0.5) / (2 * a)
+                    x2 = ({-b} + {delta} ** 0.5) / (2 * {a})
+                    x2 = {x2}""")
+            try:
+                x1_fraction = Fraction(x1)
+                x2_fraction = Fraction(x2)
+                print(f"""
+            The irreducible fraction of x1 and x2 are:
+                    x1 = {x1_fraction}
+                    x2 = {x2_fraction}""")
+            except Exception:
+                print("eroror or ")
+        elif delta == 0:
+            x = -b / (2 * a)
+            print(f"""
+            Discriminant is equal to zero, the solution is:
+                    x = -b / (2 * a)
+                    x = {-b} / (2 * {a})
+                    x = {x}""")
+            x_fraction = Fraction(x).limit_denominator()
+            print(f"""
+The irreducible fraction of x is:
+                  x = {x_fraction}""")
+        else:
+            print(f"""
+            Discriminant is strictly negative, the equation has no solution""")
+
+
+    @staticmethod
+    def solve_degree_1(parsed_equation):
+        a = float(parsed_equation[1])
+        b = float(parsed_equation[0])
+        if a == 0:
+            if b == 0:
+                print("All real numbers are solutions")
+            else:
+                print("No solution")
+        else:
+            x = -b / a
+            print(f"""The solution is:
+                  x = -b / a
+                  x = {-b} / {a}
+                  x = {x}""")
+            x_fraction = Fraction(x).limit_denominator()
+            print(f"""
+The irreducible fraction of x is:
+                  x = {x_fraction}""")

@@ -13,7 +13,7 @@ class PolynomialSolver:
                 value = f"{equation[i - 2]}{equation[i - 1]}"
 
                 if equation_parts == 'right':
-                    stock[key] = str(float(stock.get(key, 0)) - float(value))
+                    stock[key] = str(float(stock[key]) - float(value))
                     if stock[key] == '0.0':
                         del stock[key]
                 else:
