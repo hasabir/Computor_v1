@@ -9,16 +9,16 @@ class PolynomialSolver:
         equation = equation.split(" ")
         for i in range(len(equation)):
             if equation[i] == '*':
-                key = int(equation[i + 1].split("^")[1])
+                key = equation[i + 1].split("^")[1]
                 value = f"{equation[i - 2]}{equation[i - 1]}"
-
                 if equation_parts == 'right':
-                    stock[key] = str(float(stock[key]) - float(value))
-                    if stock[key] == '0.0':
+                    stock[key] = str(float(stock.get(key, 0)) - float(value))
+                    if float(stock[key]) == 0:
                         del stock[key]
                 else:
                     if float(value) != 0:
                         stock[key] = value
+        
         return stock
     
     def get_parsed_equation(self):
@@ -27,9 +27,10 @@ class PolynomialSolver:
 
     @staticmethod
     def solve_degree_2(parsed_equation):
-        a = float(parsed_equation[2])
-        b = float(parsed_equation[1])
-        c = float(parsed_equation[0])
+        a = float(parsed_equation['2'])
+        b = float(parsed_equation.get('1', 0))
+        c = float(parsed_equation.get('0', 0))
+    
         delta = b ** 2 - 4 * a * c
         if delta > 0:
             x1 = (-b - delta ** 0.5) / (2 * a)
@@ -44,13 +45,16 @@ class PolynomialSolver:
 
     @staticmethod
     def solve_degree_1(parsed_equation):
-        a = float(parsed_equation[1])
-        b = float(parsed_equation[0])
-        if a == 0:
-            if b == 0:
+        b = float(parsed_equation.get('1', 0))
+        c = float(parsed_equation.get('0', 0))
+    
+        if b == 0:
+            if c == 0:
                 print("All real numbers are solutions")
             else:
                 print("No solution")
         else:
-            x = -b / a
+            x = -c / b
             print(f"The solution is:\n{x}")
+
+
