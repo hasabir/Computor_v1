@@ -40,7 +40,9 @@ class PolynomialSolver:
             x = -b / (2 * a)
             print(f"Discriminant is equal to zero, the solution is:\n{x}")
         else:
-            print(f"Discriminant is strictly negative, the equation has no solution")
+            x1 = (-b - delta ** 0.5) / (2 * a)
+            x2 = (-b + delta ** 0.5) / (2 * a)
+            print(f"Discriminant is strictly negative, the two complex solutions are:\n{x1}\n{x2}")
 
 
     @staticmethod

@@ -84,8 +84,19 @@ class AdvancedPolynomialSolver(PolynomialSolver):
 The irreducible fraction of x is:
                   x = {x_fraction}""")
         else:
+            x1 = (-b - delta ** 0.5) / (2 * a)
+            x2 = (-b + delta ** 0.5) / (2 * a)
             print(f"""
-            Discriminant is strictly negative, the equation has no solution""")
+            Discriminant is strictly negative, the two complex solutions are:
+                    x1 = (-b - delta ** 0.5) / (2 * a)
+                    x1 = ({-b} - {delta} ** 0.5) / (2 * {a})
+                    x1 = {x1}
+                    
+                    x2 = (-b + delta ** 0.5) / (2 * a)
+                    x2 = ({-b} + {delta} ** 0.5) / (2 * {a})
+                    x2 = {x2}""")
+
+
 
 
     @staticmethod
